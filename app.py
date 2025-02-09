@@ -5,6 +5,7 @@ import os
 import json
 import re
 import datetime
+import subprocess
 import ollama  # New: Ollama integration for local LLMs
 import textattack  # For adversarial mutation
 from deep_translator import GoogleTranslator  # For backtranslation
@@ -18,6 +19,23 @@ USE_OPENAI = bool(DEFAULT_OPENAI_API_KEY)
 
 # File to store results
 RESULTS_FILE = "jailbreak_results.json"
+
+# ------------------------------
+# New Function to Download a Model
+# ------------------------------
+def download_model(model_name="deepseek-r1:1.5B"):
+    """
+    Attempts to download the specified model locally using the Ollama CLI.
+    """
+    try:
+        # Run the Ollama CLI command to pull the model
+        result = subprocess.run(["ollama", "pull", model_name], capture_output=True, text=True)
+        if result.returncode == 0:
+            st.success(f"Model {model_name} downloaded successfully.")
+        else:
+            st.error(f"Error downloading model {model_name}: {result.stderr}")
+    except Exception as e:
+        st.error(f"Exception while downloading model {model_name}: {e}")
 
 # ------------------------------
 # Core App Code (Functions & Classes)
@@ -280,6 +298,10 @@ if openai_api_key:
 else:
     USE_OPENAI = False
     st.sidebar.info("Using Ollama backend (no OpenAI API key provided)")
+
+# NEW: Add a button to download the deepseek-r1:1.5B model locally
+if st.sidebar.button("Download deepseek-r1:1.5B Model"):
+    download_model("deepseek-r1:1.5B")
 
 if st.sidebar.button("Run Test"):
     if test_mode == "Single Test":
