@@ -1,6 +1,6 @@
+streamlit
 openai
 ollama
 textattack
 deep-translator
 python-dotenv
-Flask
